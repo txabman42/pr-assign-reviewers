@@ -13,6 +13,7 @@ URI = 'https://api.github.com'
 API_HEADER = 'Accept: application/vnd.github.v3+json'
 AUTH_HEADER = 'Authorization: token' + os.environ['GITHUB_TOKEN']
 
+print('GITHUB_EVENT_PATH: ' + os.environ['GITHUB_EVENT_PATH'])
 event_path = json.loads(os.environ['GITHUB_EVENT_PATH'])
 print(event_path)
 number = event_path[".pull_request.number"]
