@@ -3,10 +3,10 @@ import sys
 import json
 import requests
 
-if (os.environ['GITHUB_REPOSITORY'] == null):
+if (os.environ['GITHUB_REPOSITORY'] is None):
     sys.exit('The env variable GITHUB_REPOSITORY is required')
 
-if (os.environ['GITHUB_EVENT_PATH'] == null):
+if (os.environ['GITHUB_EVENT_PATH'] is None):
     sys.exit('The env variable GITHUB_EVENT_PATH is required')
 
 URI = 'https://api.github.com'
