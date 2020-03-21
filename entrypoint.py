@@ -4,10 +4,10 @@ import json
 import requests
 
 if (os.environ['GITHUB_REPOSITORY'] == null):
-    sys.('The env variable GITHUB_REPOSITORY is required')
+    sys.exit('The env variable GITHUB_REPOSITORY is required')
 
 if (os.environ['GITHUB_EVENT_PATH'] == null):
-    sys.('The env variable GITHUB_EVENT_PATH is required')
+    sys.exit('The env variable GITHUB_EVENT_PATH is required')
 
 URI = 'https://api.github.com'
 API_HEADER = 'Accept: application/vnd.github.v3+json'
@@ -19,7 +19,7 @@ number = event_path[".pull_request.number"]
 print('Number: ' + number)
 
 print('GitHub event')
-print os.environ['GITHUB_EVENT_PATH']
+print(os.environ['GITHUB_EVENT_PATH'])
 
 def get_pr_info():
     api_url = URI + '/repos/' + os.environ['GITHUB_REPOSITORY'] + '/pulls/'
