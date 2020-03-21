@@ -22,7 +22,7 @@ print('GitHub event')
 print(os.environ['GITHUB_EVENT_PATH'])
 
 def get_pr_info():
-    api_url = URI + '/repos/' + os.environ['GITHUB_REPOSITORY'] + '/pulls/'
+    api_url = URI + '/repos/' + os.environ['GITHUB_REPOSITORY'] + '/pulls/' + number
     headers = {API_HEADER, AUTH_HEADER}
     response = requests.get(api_url, headers=headers)
     print(response)
