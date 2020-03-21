@@ -1,6 +1,6 @@
 FROM python:3.7
 
-CMD pip install requests
+RUN pip install requests
 
 COPY entrypoint.py /entrypoint.py
 
