@@ -1,0 +1,11 @@
+name: 'pr-assign-reviewers'
+description: 'GitHub action to add the pull request owner as Assignee and other colleges as Reviewers'
+inputs:
+  GITHUB_TOKEN:  # id of input
+    description: 'GitHub token'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.GITHUB_TOKEN }}
