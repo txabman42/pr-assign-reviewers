@@ -1,29 +1,62 @@
-import os
-import sys
-import json
-import requests
+#!/bin/bash
+set -e
 
-if (os.environ['GITHUB_REPOSITORY'] is None):
-    sys.exit('The env variable GITHUB_REPOSITORY is required')
+if [[ -z "$GITHUB_REPOSITORY" ]]; then
+  echo "The env variable GITHUB_REPOSITORY is required."
+  exit 1
+fi
 
-if (os.environ['GITHUB_EVENT_PATH'] is None):
-    sys.exit('The env variable GITHUB_EVENT_PATH is required')
+if [[ -z "$GITHUB_EVENT_PATH" ]]; then
+  echo "The env variable GITHUB_EVENT_PATH is required."
+  exit 1
+fi
 
-URI = 'https://api.github.com'
-API_HEADER = 'Accept: application/vnd.github.v3+json'
-AUTH_HEADER = 'Authorization: token' + os.environ['GITHUB_TOKEN']
+GITHUB_TOKEN="$1"
 
-print('GITHUB_EVENT_PATH: ' + os.environ['GITHUB_EVENT_PATH'])
-event_path = json.loads(os.environ['GITHUB_EVENT_PATH'])
-print(event_path)
-number = event_path[".pull_request.number"]
-print('Number: ' + number)
+URI="https://api.github.com"
+API_HEADER="Accept: application/vnd.github.v3+json"
+AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
-print('GitHub event')
-print(os.environ['GITHUB_EVENT_PATH'])
+echo "GitHub event"
+echo "$GITHUB_EVENT_PATH"
 
-def get_pr_info():
-    api_url = URI + '/repos/' + os.environ['GITHUB_REPOSITORY'] + '/pulls/' + number
-    headers = {API_HEADER, AUTH_HEADER}
-    response = requests.get(api_url, headers=headers)
-    print(response)
+number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+
+autolabel() {
+  # https://developer.github.com/v3/pulls/#get-a-single-pull-request
+  # Example: https://api.github.com/repos/CodelyTV/java-ddd-example/pulls/7
+  body=$(curl -sSL -H "${AUTH_HEADER}" -H "${API_HEADER}" "${URI}/repos/${GITHUB_REPOSITORY}/pulls/${number}")
+
+  additions=$(echo "$body" | jq '.additions')
+  deletions=$(echo "$body" | jq '.deletions')
+  total_modifications=$(echo "$additions + $deletions" | bc)
+  label_to_add=$(label_for "$total_modifications")
+
+  echo "Labeling pull request with $label_to_add"
+
+  curl -sSL \
+    -H "${AUTH_HEADER}" \
+    -H "${API_HEADER}" \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"labels\":[\"${label_to_add}\"]}" \
+    "${URI}/repos/${GITHUB_REPOSITORY}/issues/${number}/labels"
+}
+
+label_for() {
+  if [ "$1" -lt 10 ]; then
+    label="size/xs"
+  elif [ "$1" -lt 100 ]; then
+    label="size/s"
+  elif [ "$1" -lt 500 ]; then
+    label="size/m"
+  elif [ "$1" -lt 1000 ]; then
+    label="size/l"
+  else
+    label="size/xl"
+  fi
+
+  echo "$label"
+}
+
+autolabel

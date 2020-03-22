@@ -1,7 +1,7 @@
-FROM python:3.7
+FROM alpine:3.10
 
-RUN pip install requests
+RUN apk add --no-cache bash curl jq bc
 
-COPY entrypoint.py /entrypoint.py
+ADD entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT python /entrypoint.py
+ENTRYPOINT ["/entrypoint.sh"]
