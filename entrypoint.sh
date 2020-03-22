@@ -41,6 +41,14 @@ autolabel() {
     -H "Content-Type: application/json" \
     -d "{\"labels\":[\"${label_to_add}\"]}" \
     "${URI}/repos/${GITHUB_REPOSITORY}/issues/${number}/labels"
+
+  curl -sSL \
+    -H "${AUTH_HEADER}" \
+    -H "${API_HEADER}" \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"assignees\":[\"txabman42\"]}" \
+    "${URI}/repos/${GITHUB_REPOSITORY}/issues/${number}/assignees"
 }
 
 label_for() {
